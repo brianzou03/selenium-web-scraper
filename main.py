@@ -1,5 +1,5 @@
 # Changing Room Data Engineering Coding Challenge
-# Code written by Brian Zou
+# Code written by Brian Zou for usage on PC
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -18,14 +18,23 @@ driver.get("https://www.pacsun.com/mens/shirts/")
 root_element = driver.find_element_by_id("search-result-items")
 
 
-if root_element:
-    products = root_element.find_elements_by_tag_name("li")
-    for product in products:
-        price = product.find_element_by_class_name("price-standard")
-        # promo_price = product.find_element_by_class_name("price-promo")
-        # print(product.text)
-        print(price.text)
-        # print(promo_price.text)
+class PriceSearch:
 
+    def __init__(self):
+        pass
+
+    def find_price(self):
+
+        if root_element:
+            products = root_element.find_elements_by_tag_name("li")
+            for product in products:
+                price = product.find_element_by_class_name("price-standard")
+                # print(product.text)
+                print(price.text)
+
+
+my_obj = PriceSearch()
+my_obj.find_price()
 
 driver.quit()
+
