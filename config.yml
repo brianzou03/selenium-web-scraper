@@ -4,3 +4,12 @@ display:
     window_size: 1920, 1200
 site:
     url: https://www.pacsun.com/mens/shirts/
+
+db:
+    host: aws-us-east-1-portal.9.dblayer.com
+    port: 37393
+    user: admin
+    password: OLHOERSZIIXLIMKQ
+    sslmode: require
+    sslrootcert: C:\Users\13236\PycharmProjects\seleniumWebScraper\SSL_Certificate.crt
+    database: compose
