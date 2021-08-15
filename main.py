@@ -3,25 +3,30 @@
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-
-options = Options()
-options.headless = True
-
-options.add_argument("--window-size=1920,1200")
-
-DRIVER_PATH = 'chromedriver.exe'
-
-driver = webdriver.Chrome(options=options, executable_path=DRIVER_PATH)
-driver.get("https://www.pacsun.com/mens/shirts/")
-# print(driver.page_source)
-
-root_element = driver.find_element_by_id("search-result-items")
+import yaml
 
 
 class Scraper():
 
     def __init__(self):
-        pass
+        with open("config.yml", "r") as ymlfile:
+            self.cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+
+        for section in self.cfg:
+            print(section)
+
+        options = Options()
+        options.headless = True
+
+        options.add_argument("--window-size=" + self.cfg["display"]["window_size"])
+
+        DRIVER_PATH = self.cfg["driver"]["driver_path"]
+
+        self.driver = webdriver.Chrome(options=options, executable_path=DRIVER_PATH)
+        self.driver.get(self.cfg["site"]["url"])
+
+        self.root_element = self.driver.find_element_by_id("search-result-items")
+
 
     def get_price(self, product):
         return product.find_element_by_class_name("price-standard")
@@ -33,8 +38,8 @@ class Scraper():
         return name_link.get_attribute("href")
 
     def find_element(self):
-        if root_element:
-            products = root_element.find_elements_by_tag_name("li")
+        if self.root_element:
+            products = self.root_element.find_elements_by_tag_name("li")
             for product in products:
                 price = self.get_price(product)
                 name_link = product.find_element_by_class_name("name-link")
@@ -44,8 +49,12 @@ class Scraper():
                 print(name)
                 print(link)
 
+    def __del__(self):
+        if self.driver:
+            self.driver.quit()
 
-my_obj = Scraper()
-my_obj.find_element()
 
-driver.quit()
+scraper = Scraper()
+scraper.find_element()
+
+del scraper
