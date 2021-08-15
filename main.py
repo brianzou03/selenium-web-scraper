@@ -41,8 +41,15 @@ class Scraper():
         self.cursor = self.connection.cursor()
 
     def enrich_element(self, element):
-        enriched_element = element
+        self.driver.get(element["url"])
+        my_price = self.driver.find_element_by_class_name("price-standard")
+        my_color = self.driver.find_element_by_class_name("rwd-swatch-value")
+        my_review_score = self.driver.find_element_by_class_name("sr-only")
+        enriched_element = {"price": my_price.text,
+                            "color": my_color.text[7:],
+                            "review_score": my_review_score.text[:3]}
         return enriched_element
+
 
     def get_price(self, product):
         return product.find_element_by_class_name("price-standard")
@@ -65,7 +72,9 @@ class Scraper():
                 link = self.get_link(name_link)
                 # print(name, price.text, link)
 
-                product_elements.append([{"name": name, "price": price.text, "url": link}])
+                product_elements.append({"name": name,
+                                         "price": price.text,
+                                         "url": link})
                 total_products += 1
 
             for element in product_elements:
