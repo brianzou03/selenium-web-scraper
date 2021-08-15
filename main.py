@@ -40,6 +40,9 @@ class Scraper():
 
         self.cursor = self.connection.cursor()
 
+    def enrich_element(self, element):
+        enriched_element = element
+        return enriched_element
 
     def get_price(self, product):
         return product.find_element_by_class_name("price-standard")
@@ -54,18 +57,28 @@ class Scraper():
         total_products = 0
         if self.root_element:
             products = self.root_element.find_elements_by_tag_name("li")
+            product_elements = []
             for product in products:
                 price = self.get_price(product)
                 name_link = product.find_element_by_class_name("name-link")
                 name = self.get_name(name_link)
                 link = self.get_link(name_link)
-                print(name, price.text, link)
+                # print(name, price.text, link)
+
+                product_elements.append([{"name": name, "price": price.text, "url": link}])
                 total_products += 1
+
+            for element in product_elements:
+                enriched_element = self.enrich_element(element)
+                print(enriched_element)
+
+                """
                 self.cursor.execute('INSERT INTO products (name, price, link) VALUES ( %s, %s, %s)',
                                     (name, price.text, link))
                 self.connection.commit()
+                """
+        return total_products
 
-            return total_products
 
     def __del__(self):
         if self.driver:
