@@ -44,10 +44,11 @@ class Scraper():
         self.driver.get(element["url"])
         my_price = self.driver.find_element_by_class_name("price-standard")
         my_color = self.driver.find_element_by_class_name("rwd-swatch-value")
-        my_review_score = self.driver.find_element_by_class_name("sr-only")
-        enriched_element = {"price": my_price.text,
-                            "color": my_color.text[7:],
-                            "review_score": my_review_score.text[:3]}
+        my_rating = self.driver.find_element_by_class_name("sr-only")
+        enriched_element = {"color": my_color.text[7:],
+                            "rating": my_rating.text[:3],
+                            "price": my_price.text
+                            }
         return enriched_element
 
 
@@ -81,11 +82,16 @@ class Scraper():
                 enriched_element = self.enrich_element(element)
                 print(enriched_element)
 
-                """
-                self.cursor.execute('INSERT INTO products (name, price, link) VALUES ( %s, %s, %s)',
-                                    (name, price.text, link))
+
+                self.cursor.execute('INSERT INTO products (name, color, rating, price, link) '
+                                    'VALUES ( %s, %s, %s, %s, %s)',
+                                    (element["name"],
+                                     enriched_element["color"],
+                                     enriched_element["rating"],
+                                     enriched_element["price"],
+                                     element["url"]))
                 self.connection.commit()
-                """
+
         return total_products
 
 
