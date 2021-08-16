@@ -7,7 +7,7 @@ import yaml
 import psycopg2
 
 
-class Scraper():
+class Scraper:
 
     def __init__(self):
         with open("config.yml", "r") as ymlfile:
@@ -36,7 +36,9 @@ class Scraper():
             port=self.cfg["db"]["port"],
             user=self.cfg["db"]["user"],
             password=self.cfg["db"]["password"],
-            database=self.cfg["db"]["database"])
+            database=self.cfg["db"]["database"],
+            sslmode=self.cfg["db"]["sslmode"],
+            sslrootcert=self.cfg["db"]["sslrootcert"])
 
         self.cursor = self.connection.cursor()
 
@@ -45,15 +47,14 @@ class Scraper():
         my_price = self.driver.find_element_by_class_name("price-standard")
         my_color = self.driver.find_element_by_class_name("rwd-swatch-value")
         my_rating = self.driver.find_element_by_class_name("sr-only")
+        # my_sku = self.driver.find_element_by_class_name("sku")
+
         enriched_element = {"color": my_color.text[7:],
                             "rating": my_rating.text[:3],
-                            "price": my_price.text
+                            "price": my_price.text  # ,
+                            # "sku": my_sku.text
                             }
         return enriched_element
-
-
-    def get_price(self, product):
-        return product.find_element_by_class_name("price-standard")
 
     def get_name(self, name_link):
         return name_link.get_attribute("title")
@@ -67,21 +68,17 @@ class Scraper():
             products = self.root_element.find_elements_by_tag_name("li")
             product_elements = []
             for product in products:
-                price = self.get_price(product)
                 name_link = product.find_element_by_class_name("name-link")
                 name = self.get_name(name_link)
                 link = self.get_link(name_link)
-                # print(name, price.text, link)
-
                 product_elements.append({"name": name,
-                                         "price": price.text,
-                                         "url": link})
+                                         "url": link
+                                         })
                 total_products += 1
 
             for element in product_elements:
                 enriched_element = self.enrich_element(element)
                 print(enriched_element)
-
 
                 self.cursor.execute('INSERT INTO products (name, color, rating, price, link) '
                                     'VALUES ( %s, %s, %s, %s, %s)',
@@ -94,7 +91,6 @@ class Scraper():
 
         return total_products
 
-
     def __del__(self):
         if self.driver:
             self.driver.quit()
@@ -104,4 +100,3 @@ scraper = Scraper()
 scraper.find_element()
 
 del scraper
-
