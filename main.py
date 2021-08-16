@@ -10,14 +10,11 @@ import psycopg2
 class Scraper:
 
     def __init__(self, save_to_database=None, max_products=-1):
-        # Opens yaml file and enters configurations
+        # Opens yaml file and loads configurations
         self.save_to_database = save_to_database
         self.max_products = max_products
         with open("config.yml", "r") as ymlfile:
             self.cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-
-        for section in self.cfg:
-            print(section)
 
         self.connect_db()
 
@@ -73,7 +70,7 @@ class Scraper:
     def get_link(self, name_link):
         return name_link.get_attribute("href")
 
-    # Locates elements from the shirt page, gathers enriched information via links, and sends to database
+    # Locates elements from the shirt page, gathers enriched information via links, saves to database
     def find_element(self):
         total_products = 0
         if self.root_element:
