@@ -43,7 +43,11 @@ Before you begin, ensure you have met the following requirements:
 ...
 ```
 
-### Run in PyCharm
+### Steps to run in PyCharm
+
+#### 1
+#### 2
+#### 3
 
 To run the project in the PyCharm IDE, ensure that your yaml file is configured
 to your computer. The WebDriver should be set to the appropriate web browser, and 
